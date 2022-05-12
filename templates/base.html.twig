@@ -13,7 +13,36 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
+    <div class="container sticky-lg-top bg-gradient bg-black">
+        <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none" href="/">
+                MyBooks
+            </a>
+            <div>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                    <li><a href="/">{{user.email}}</a></li>
+                    <li><a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none" href="{{ path('app_user_show', {'id': user.id}) }}">Profile</a></li>
+                    <li><a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none" href="{{ path('app_book_index') }}">Books</a></li>
+                    <li><a href="{{ path('app_logout') }}" class="nav-link px-2 link-secondary h5">Выход</a></li>
+                </ul>
+            {% else %}
+                <a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none" href="{{ path('app_login') }}">Login</a>
+                <a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none" href="{{ path('app_register') }}">Register</a>
+            {% endif %}
+            </div>
+        </header>
+    </div>
     <body>
         {% block body %}{% endblock %}
     </body>
+    <div class="container">
+            <footer class="py-3 my-4">
+                <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                    <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Pekhova Angelina PI_19</a></li>
+                </ul>
+                <p class="text-center text-muted">© 2022 i_don't_tell_u_my@gmail.com</p>
+            </footer>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </html>
