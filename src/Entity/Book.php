@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\BookRepository;
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BookRepository;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
