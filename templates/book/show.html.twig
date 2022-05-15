@@ -8,10 +8,6 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ book.id }}</td>
-            </tr>
-            <tr>
                 <th>Name</th>
                 <td>{{ book.name }}</td>
             </tr>
@@ -21,11 +17,10 @@
             </tr>
             <tr>
                 <th>Cover</th>
-                <td>{{ book.cover }}</td>
+                <td><img src="{{ book.cover}}" style='height: 200px;'></td>
             </tr>
             <tr>
-                <th>File</th>
-                <td>{{ book.file }}</td>
+                <td><a href="{{ book.file }}" download>Скачать книгу</a></td>
             </tr>
             <tr>
                 <th>Last_reading_date</th>

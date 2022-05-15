@@ -22,8 +22,8 @@ class AppFixtures extends Fixture
                 $book = new Book();
                 $book->setName('book_'.$j);
                 $book->setAuthor('author_'.$j);
-                $book->setCover('..\resources\img\annie-spratt-AA4QB4Q1v14-unsplash.jpg');
-                $book->setFile('..\resources\files\IgorMireckiy_Arhivarius_RuLit_Me_386934.pdf');
+                $book->setCover('\resources\img\annie-spratt-AA4QB4Q1v14-unsplash.jpg');
+                $book->setFile('\resources\files\IgorMireckiy_Arhivarius_RuLit_Me_386934.pdf');
                 $book->setUserId($user);
                 $manager->persist($book);
             }

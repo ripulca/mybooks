@@ -6,38 +6,42 @@
     <h1>Book index</h1>
 
     <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Author</th>
-                <th>Cover</th>
-                <th>File</th>
-                <th>Last_reading_date</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for book in books %}
-            <tr>
-                <td>{{ book.id }}</td>
-                <td>{{ book.name }}</td>
-                <td>{{ book.author }}</td>
-                <td>{{ book.cover }}</td>
-                <td>{{ book.file }}</td>
-                <td>{{ book.lastReadingDate ? book.lastReadingDate|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_book_show', {'id': book.id}) }}">show</a>
-                    <a href="{{ path('app_book_edit', {'id': book.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="container">
+        <div class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light">
+            <div class="row">
+                {% for book in books %}
+                        <div class="col-md-5 p-lg-2 mx-auto">
+                            <a href="{{ path('app_book_show', {'id': book.id}) }}" style='margin: 20px;'>
+                                <img src="{{ book.cover}}" style='height: 200px;'>
+                            </a>                            
+                            <p>{{ book.name }}</p>
+                        </div>
+                {% else %}
+                    <p colspan="5">no records found, please, come back later</p>
+                {% endfor %}
+            </div> 
+        </div>
 
-    <a href="{{ path('app_book_new') }}">Create new</a>
+        <a href="{{ path('app_book_new') }}">Create new</a>
+        {% if maxPages > 1 %}
+            <ul class="pagination pagination-sm">
+                {# `«` arrow  #}
+                <li {{ thisPage == 1 ? 'class="disabled"' }}>
+                    <a href="{{ path('app_book_pages_index', {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}" class="text-center p-3 mx-auto link-secondary">«</a>
+                </li>
+
+                {# Render each page number #}
+                {% for i in 1..maxPages %}
+                <li {{ thisPage == i ? 'class="active"' }}>
+                <a href="{{ path('app_book_pages_index', {page: i}) }}" class="text-center p-3 mx-auto link-secondary">{{ i }}</a>
+                </li>
+                {% endfor %}
+
+                {# `»` arrow #}
+                <li {{ thisPage == maxPages ? 'class="disabled"' }}>
+                    <a href="{{ path('app_book_pages_index', {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}" class="text-center p-3 mx-auto link-secondary">»</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>    
 {% endblock %}
