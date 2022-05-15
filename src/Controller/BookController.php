@@ -5,19 +5,32 @@ namespace App\Controller;
 use App\Entity\Book;
 use App\Form\BookType;
 use App\Repository\BookRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/book')]
 class BookController extends AbstractController
 {
     #[Route('/', name: 'app_book_index', methods: ['GET'])]
-    public function index(BookRepository $bookRepository): Response
+    public function index(Request $request, BookRepository $bookRepository, UserRepository $userRepository): Response
     {
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+        $email = $session->get(Security::LAST_USERNAME) ?? null;
+        $user=$userRepository->findOneByEmail($email);
+        $user_id=$user->getId();
         return $this->render('book/index.html.twig', [
-            'books' => $bookRepository->findAll(),
+            'books' => $bookRepository->findBy(
+                ['user_id' => $user_id],
+            ),
+            'user'=>$user
         ]);
     }
 
@@ -41,16 +54,29 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_book_show', methods: ['GET'])]
-    public function show(Book $book): Response
+    public function show(Request $request, Book $book, UserRepository $userRepository): Response
     {
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+        $email = $session->get(Security::LAST_USERNAME) ?? null;
+        $user=$userRepository->findOneByEmail($email);
         return $this->render('book/show.html.twig', [
             'book' => $book,
+            'user'=>$user
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Book $book, BookRepository $bookRepository): Response
+    public function edit(Request $request, Book $book, BookRepository $bookRepository, UserRepository $userRepository): Response
     {
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+        $email = $session->get(Security::LAST_USERNAME) ?? null;
+        $user=$userRepository->findOneByEmail($email);
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
 
@@ -63,6 +89,7 @@ class BookController extends AbstractController
         return $this->renderForm('book/edit.html.twig', [
             'book' => $book,
             'form' => $form,
+            'user'=>$user
         ]);
     }
 

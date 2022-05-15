@@ -42,13 +42,12 @@ class BookRepository extends ServiceEntityRepository
 //    /**
 //     * @return Book[] Returns an array of Book objects
 //     */
-//    public function findByExampleField($value): array
+//    public function updateReadingDate($id, $user_id, $date): array
 //    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
+//        return $this->createQueryBuilder('UPDATE book SET reading_date=:val WHERE id=:id AND `user_id_id=:user_id_id;')
+//            ->setParameter('val', $date)
+//            ->setParameter('id', $id)
+//            ->setParameter('user_id_id', $user_id)
 //            ->getQuery()
 //            ->getResult()
 //        ;
