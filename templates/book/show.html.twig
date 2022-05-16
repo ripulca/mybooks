@@ -23,6 +23,9 @@
                 <td><a href="{{ book.file }}" download>Скачать книгу</a></td>
             </tr>
             <tr>
+                <td><a href="{{ book.file }}">Читать книгу</a></td>
+            </tr>
+            <tr>
                 <th>Last_reading_date</th>
                 <td>{{ book.lastReadingDate ? book.lastReadingDate|date('Y-m-d') : '' }}</td>
             </tr>

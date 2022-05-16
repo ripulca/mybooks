@@ -40,11 +40,22 @@ class BookRepository extends ServiceEntityRepository
         }
     }
 
-    public function getAllBooks($id, $currentPage = 1)
+    public function getAllBooksById($id, $currentPage = 1)
     {
         $query = $this->createQueryBuilder('b')
             ->andWhere('b.user_id =:val')
             ->setParameter('val', $id)
+            ->orderBy('b.last_reading_date', 'DESC')
+            ->getQuery();
+
+        $paginator = $this->paginate($query, $currentPage);
+
+        return $paginator;
+    }
+
+    public function getAllBooks($currentPage = 1)
+    {
+        $query = $this->createQueryBuilder('b')
             ->orderBy('b.last_reading_date', 'DESC')
             ->getQuery();
 

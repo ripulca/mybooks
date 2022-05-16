@@ -13,52 +13,93 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
-#[Route('/book')]
+#[Route('/books')]
 class BookController extends AbstractController
 {
     #[Route('/', name: 'app_book_index', methods: ['GET'])]
     public function index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response
     {
         $session = $request->getSession();
-        if (!$session->isStarted()) {
-            $session->start();
-        }
         $email = $session->get(Security::LAST_USERNAME) ?? null;
-        $user=$userRepository->findOneByEmail($email);
-        $user_id=$user->getId();
-        $books= $bookRepository->getAllBooks($user_id);
-        return $this->render('book/index.html.twig', [
-            'books' => $books,
-            'maxPages' => $page,
-            'user'=>$user
-        ]);
+        if($email!=NULL){
+            if (!$session->isStarted()) {
+                $session->start();
+                $user=$userRepository->findOneByEmail($email);
+                $user_id=$user->getId();
+                $books= $bookRepository->getAllBooksById($user_id);
+                $totalBooksReturned = $books->getIterator()->count();
+                $totalBooks = $books->count();
+                $maxPages=1;
+                if($totalBooks!=0 && $totalBooksReturned!=0){
+                    $maxPages = ceil($totalBooks / $totalBooksReturned);
+                }
+                return $this->render('book/index.html.twig', [
+                    'books' => $books,
+                    'maxPages' => $page,
+                    'user'=>$user,
+                    'maxPages' => $maxPages,
+                    'thisPage'=>$page,
+                ]);
+            }
+        }
+        else{
+            $books= $bookRepository->getAllBooks();
+            $totalBooksReturned = $books->getIterator()->count();
+            $totalBooks = $books->count();
+            $maxPages=1;
+            if($totalBooks!=0 && $totalBooksReturned!=0){
+                $maxPages = ceil($totalBooks / $totalBooksReturned);
+            }
+            return $this->render('book/index.html.twig', [
+                'books' => $books,
+                'maxPages' => $page,
+                'maxPages' => $maxPages,
+                'thisPage'=>$page,
+            ]);
+        }
     }
     
     #[Route('/{page}', name: 'app_book_pages_index', requirements: ['page' => '\d+'], methods: ['GET'])]
     public function page_index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response
     {
         $session = $request->getSession();
-        if (!$session->isStarted()) {
-            $session->start();
+        $email = $session->get(Security::LAST_USERNAME) ?? null;        
+        if($email!=NULL){
+            if (!$session->isStarted()) {
+                $session->start();
+            }
+            $user=$userRepository->findOneByEmail($email);
+            $user_id=$user->getId();
+            $books= $bookRepository->getAllBooksById($user_id, $page);
+            $totalBooksReturned = $books->getIterator()->count();
+            $totalBooks = $books->count();
+            $maxPages=1;
+            if($totalBooks!=0 && $totalBooksReturned!=0){
+                $maxPages = ceil($totalBooks / $totalBooksReturned);
+            }
+            return $this->render('book/index.html.twig', [
+                'books' =>$books,
+                'user'=>$user,
+                'maxPages' => $maxPages,
+                'thisPage'=>$page,
+            ]);
         }
-        $email = $session->get(Security::LAST_USERNAME) ?? null;
-        $user=$userRepository->findOneByEmail($email);
-        $user_id=$user->getId();
-        $books= $bookRepository->getAllBooks($user_id, $page);
-        $totalBooksReturned = $books->getIterator()->count();
-        $totalBooks = $books->count();
-        $iterator = $books->getIterator();
-        $maxPages=1;
-        if($totalBooks!=0 && $totalBooksReturned!=0){
-            $maxPages = ceil($totalBooks / $totalBooksReturned);
+        else{
+            $books= $bookRepository->getAllBooks($page);
+            $totalBooksReturned = $books->getIterator()->count();
+            $totalBooks = $books->count();
+            $maxPages=1;
+            if($totalBooks!=0 && $totalBooksReturned!=0){
+                $maxPages = ceil($totalBooks / $totalBooksReturned);
+            }
+            return $this->render('book/index.html.twig', [
+                'books' =>$books,
+                'maxPages' => $maxPages,
+                'thisPage'=>$page,
+            ]);
         }
-        return $this->render('book/index.html.twig', [
-            'books' =>$books,
-            'user'=>$user,
-            'maxPages' => $maxPages,
-
-        ]);
     }
 
     #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
@@ -117,7 +158,7 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/book/{id}', name: 'app_book_show', methods: ['GET'])]
+    #[Route('/book_obj/{id}', name: 'app_book_show', methods: ['GET'])]
     public function show(Request $request, Book $book, UserRepository $userRepository): Response
     {
         $session = $request->getSession();
@@ -132,7 +173,7 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/book/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
+    #[Route('/book_obj/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Book $book, BookRepository $bookRepository, UserRepository $userRepository): Response
     {
         $session = $request->getSession();
@@ -157,7 +198,7 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/book/{id}', name: 'app_book_delete', methods: ['POST'])]
+    #[Route('/book_obj/{id}', name: 'app_book_delete', methods: ['POST'])]
     public function delete(Request $request, Book $book, BookRepository $bookRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
