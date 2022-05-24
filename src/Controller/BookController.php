@@ -19,11 +19,11 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class BookController extends AbstractController
 {
     #[Route('/', name: 'app_book_index', methods: ['GET'])]
-    public function index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response
+    public function index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response      //вывод начальной страницы
     {
         $session = $request->getSession();
-        $email = $session->get(Security::LAST_USERNAME) ?? null;
-        if($email!=NULL){
+        $email = $session->get(Security::LAST_USERNAME) ?? null;    //получение почты для вывода на странице
+        if($email!=NULL){   //если пользователь авторизован, выводим только его книги
             if (!$session->isStarted()) {
                 $session->start();
                 $user=$userRepository->findOneByEmail($email);
@@ -44,7 +44,7 @@ class BookController extends AbstractController
                 ]);
             }
         }
-        else{
+        else{       //иначе выводим все книги
             $books= $bookRepository->getAllBooks();
             $totalBooksReturned = $books->getIterator()->count();
             $totalBooks = $books->count();
@@ -62,7 +62,7 @@ class BookController extends AbstractController
     }
     
     #[Route('/{page}', name: 'app_book_pages_index', requirements: ['page' => '\d+'], methods: ['GET'])]
-    public function page_index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response
+    public function page_index(Request $request, BookRepository $bookRepository, UserRepository $userRepository, $page=1): Response     //начальная страница с пагинацией
     {
         $session = $request->getSession();
         $email = $session->get(Security::LAST_USERNAME) ?? null;        
@@ -103,7 +103,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, BookRepository $bookRepository, UserRepository $userRepository, SluggerInterface $slugger): Response
+    public function new(Request $request, BookRepository $bookRepository, UserRepository $userRepository, SluggerInterface $slugger): Response      //создание новой книги
     {
         $session = $request->getSession();
         if (!$session->isStarted()) {
@@ -126,26 +126,24 @@ class BookController extends AbstractController
                 $cover_newFilename = $cover_safeFilename.'-'.uniqid().'.'.$coverFile->guessExtension();
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$bookFile->guessExtension();
 
-                // Переместите файлв каталог, где хранятся брошюры
                 try {
                     // var_dump($cover_newFilename);
                     $coverFile->move(
-                        $this->getParameter('img_directory'),
+                        $this->getParameter('img_directory'),       //сохранение обложки на сервере
                         $cover_newFilename
                     );
                     $bookFile->move(
-                        $this->getParameter('file_directory'),
+                        $this->getParameter('file_directory'),       //сохранение файла книги на сервере
                         $newFilename
                     );
                 } catch (FileException $e) {
                     echo 'Error: '.$e->getMessage.'\n';
-                    // ... разберитесь с исключением, если что-то случится во время загрузки файла
                 }
                 $book->setAuthor($form->get('author')->getData());
                 $book->setUserId($user);
                 $book->setCover('\\resources\\img\\'.$cover_newFilename);
                 $book->setFile('\\resources\\files\\'.$newFilename);
-                $bookRepository->add($book, true);
+                $bookRepository->add($book, true);      //добавление записи
             }
 
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
@@ -159,7 +157,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/book_obj/{id}', name: 'app_book_show', methods: ['GET'])]
-    public function show(Request $request, Book $book, UserRepository $userRepository): Response
+    public function show(Request $request, Book $book, UserRepository $userRepository): Response    //показать одну книгу
     {
         $session = $request->getSession();
         if (!$session->isStarted()) {
@@ -174,7 +172,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/book_obj/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Book $book, BookRepository $bookRepository, UserRepository $userRepository): Response
+    public function edit(Request $request, Book $book, BookRepository $bookRepository, UserRepository $userRepository): Response    //редактировать книгу
     {
         $session = $request->getSession();
         if (!$session->isStarted()) {
@@ -199,7 +197,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/book_obj/{id}', name: 'app_book_delete', methods: ['POST'])]
-    public function delete(Request $request, Book $book, BookRepository $bookRepository): Response
+    public function delete(Request $request, Book $book, BookRepository $bookRepository): Response      //удалить книгу
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
             $bookRepository->remove($book, true);
