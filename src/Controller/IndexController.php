@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index', methods: ['GET'])]
-    public function index(Request $request, UserRepository $userRepository): Response
+    public function index(Request $request, UserRepository $userRepository): Response       //вывод домашней страницы
     {
         $session = $request->getSession();
         if (!$session->isStarted()) {
