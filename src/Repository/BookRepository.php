@@ -40,7 +40,7 @@ class BookRepository extends ServiceEntityRepository
         }
     }
 
-    public function getAllBooksById($id, $currentPage = 1)
+    public function getAllBooksById($id, $currentPage = 1)  //получить книги конкретного пользователя
     {
         $query = $this->createQueryBuilder('b')
             ->andWhere('b.user_id =:val')
@@ -53,7 +53,7 @@ class BookRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getAllBooks($currentPage = 1)
+    public function getAllBooks($currentPage = 1)       //получить все книги
     {
         $query = $this->createQueryBuilder('b')
             ->orderBy('b.last_reading_date', 'DESC')
@@ -65,7 +65,7 @@ class BookRepository extends ServiceEntityRepository
     }
 
     
-    public function paginate($dql, $page = 1, $limit = 8)
+    public function paginate($dql, $page = 1, $limit = 8)       //пагинация
     {
         $paginator = new Paginator($dql);
 
